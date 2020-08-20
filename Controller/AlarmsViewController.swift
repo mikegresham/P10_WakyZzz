@@ -60,6 +60,15 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         alarm.repeatDays[0] = true
         alarm.repeatDays[6] = true
         alarms.append(alarm)
+        
+        // Weekend 9am
+        alarm = Alarm()
+        alarm.time = 12 * 3600
+        alarm.enabled = false
+        alarm.repeatDays[0] = true
+        alarm.repeatDays[6] = true
+        alarms.append(alarm)
+        alarms = alarms.sorted(by: { $0.time < $1.time })
     }
     
     //MARK: TableViewDelegate
@@ -144,9 +153,22 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func alarmViewControllerDone(alarm: Alarm) {
         if let editingIndexPath = editingIndexPath {
             tableView.reloadRows(at: [editingIndexPath], with: .automatic)
-        }
-        else {
-            addAlarm(alarm, at: IndexPath(row: alarms.count, section: 0))
+        } else if alarms.count == 0 {
+            addAlarm(alarm, at: IndexPath(row: 0, section: 0))
+        } else {
+            var completion = false
+            for i in 0 ..< alarms.count {
+                if alarm.time < alarms[i].time {
+                    addAlarm(alarm, at: IndexPath(row: i, section: 0))
+                    completion = true
+                } else if i == alarms.count - 1 {
+                    addAlarm(alarm, at: IndexPath(row: alarms.count, section: 0))
+                    completion = true
+                    }
+                if completion == true {
+                    break
+                }
+            }
         }
         editingIndexPath = nil
     }
