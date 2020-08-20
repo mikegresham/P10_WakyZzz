@@ -129,7 +129,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func moveAlarm(from originalIndextPath: IndexPath, to targetIndexPath: IndexPath) {
         let alarm = alarms.remove(at: originalIndextPath.row)
-        alarms.insert(alarm, at: targetIndexPath.row)
+        alarms.insert(alarm, at: targetIndexPath.row - 1)
         tableView.reloadData()
     }
     
@@ -152,25 +152,25 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func alarmViewControllerDone(alarm: Alarm) {
         if let editingIndexPath = editingIndexPath {
+            let indexPath = getIndexPathForAlarm(alarm: alarm)
+            moveAlarm(from: editingIndexPath, to: indexPath)
             tableView.reloadRows(at: [editingIndexPath], with: .automatic)
         } else if alarms.count == 0 {
             addAlarm(alarm, at: IndexPath(row: 0, section: 0))
         } else {
-            var completion = false
-            for i in 0 ..< alarms.count {
-                if alarm.time < alarms[i].time {
-                    addAlarm(alarm, at: IndexPath(row: i, section: 0))
-                    completion = true
-                } else if i == alarms.count - 1 {
-                    addAlarm(alarm, at: IndexPath(row: alarms.count, section: 0))
-                    completion = true
-                    }
-                if completion == true {
-                    break
-                }
-            }
+            let indexPath = getIndexPathForAlarm(alarm: alarm)
+            addAlarm(alarm, at: indexPath)
         }
         editingIndexPath = nil
+    }
+    
+    func getIndexPathForAlarm(alarm: Alarm) -> IndexPath {
+        for i in 0 ..< alarms.count {
+            if alarm.time < alarms[i].time {
+                return IndexPath(row: i, section: 0)
+            }
+        }
+        return IndexPath(row: alarms.count, section: 0)
     }
     
     func alarmViewControllerCancel() {
