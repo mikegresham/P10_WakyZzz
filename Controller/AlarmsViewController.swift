@@ -9,14 +9,20 @@
 import UIKit
 
 class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AlarmCellDelegate, AlarmViewControllerDelegate {
+    
+    //MARK: IBOutlets & Global Variables
     @IBOutlet weak var tableView: UITableView!
     
     var alarms = [Alarm]()
     var editingIndexPath: IndexPath?
     
+    //MARK: Button Actions
+    
     @IBAction func addButtonPress(_ sender: Any) {
         presentAlarmViewController(alarm: nil)
     }
+    
+    //MARK: Setup
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +38,8 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         populateAlarms()
         
     }
+    
+    //MARK: Functions
     
     func populateAlarms() {
         
@@ -52,7 +60,18 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         alarm.repeatDays[0] = true
         alarm.repeatDays[6] = true
         alarms.append(alarm)
+        
+        // Weekend 9am
+        alarm = Alarm()
+        alarm.time = 12 * 3600
+        alarm.enabled = false
+        alarm.repeatDays[0] = true
+        alarm.repeatDays[6] = true
+        alarms.append(alarm)
+        alarms = alarms.sorted(by: { $0.time < $1.time })
     }
+    
+    //MARK: TableViewDelegate
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -72,15 +91,17 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         return cell
     }
     
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        
-        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let delete = UIContextualAction(style: .destructive, title: "Delete") {
+            (action, view, completion) in
             self.deleteAlarm(at: indexPath)
         }
-        let edit = UITableViewRowAction(style: .normal, title: "Edit") { (action, indexPath) in
+        let edit = UIContextualAction(style: .normal, title: "Edit") {
+            (action, view, completion) in
             self.editAlarm(at: indexPath)
         }
-        return [delete, edit]
+        return UISwipeActionsConfiguration.init(actions: [delete, edit])
+        
     }
     
     func alarm(at indexPath: IndexPath) -> Alarm? {
@@ -89,7 +110,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func deleteAlarm(at indexPath: IndexPath) {
         tableView.beginUpdates()
-        alarms.remove(at: alarms.count)
+        alarms.remove(at: indexPath.row)
         tableView.deleteRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
     }
@@ -108,7 +129,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func moveAlarm(from originalIndextPath: IndexPath, to targetIndexPath: IndexPath) {
         let alarm = alarms.remove(at: originalIndextPath.row)
-        alarms.insert(alarm, at: targetIndexPath.row)
+        alarms.insert(alarm, at: targetIndexPath.row - 1)
         tableView.reloadData()
     }
     
@@ -131,12 +152,25 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func alarmViewControllerDone(alarm: Alarm) {
         if let editingIndexPath = editingIndexPath {
+            let indexPath = getIndexPathForAlarm(alarm: alarm)
+            moveAlarm(from: editingIndexPath, to: indexPath)
             tableView.reloadRows(at: [editingIndexPath], with: .automatic)
-        }
-        else {
-            addAlarm(alarm, at: IndexPath(row: alarms.count, section: 0))
+        } else if alarms.count == 0 {
+            addAlarm(alarm, at: IndexPath(row: 0, section: 0))
+        } else {
+            let indexPath = getIndexPathForAlarm(alarm: alarm)
+            addAlarm(alarm, at: indexPath)
         }
         editingIndexPath = nil
+    }
+    
+    func getIndexPathForAlarm(alarm: Alarm) -> IndexPath {
+        for i in 0 ..< alarms.count {
+            if alarm.time < alarms[i].time {
+                return IndexPath(row: i, section: 0)
+            }
+        }
+        return IndexPath(row: alarms.count, section: 0)
     }
     
     func alarmViewControllerCancel() {
