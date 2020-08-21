@@ -129,7 +129,9 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func moveAlarm(from originalIndextPath: IndexPath, to targetIndexPath: IndexPath) {
         let alarm = alarms.remove(at: originalIndextPath.row)
-        alarms.insert(alarm, at: targetIndexPath.row - 1)
+        var indexPath = targetIndexPath
+        indexPath.row = targetIndexPath.row == 0 ? 1 : targetIndexPath.row
+        alarms.insert(alarm, at: indexPath.row - 1)
         tableView.reloadData()
     }
     
