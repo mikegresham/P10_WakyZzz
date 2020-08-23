@@ -8,6 +8,8 @@
 
 import Foundation
 import UIKit
+import UserNotifications
+import CoreData
 
 protocol AlarmViewControllerDelegate {
     func alarmViewControllerDone(alarm: Alarm)
@@ -31,7 +33,10 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func config() {        
         if alarm == nil {
             navigationItem.title = "New Alarm"
-            alarm = Alarm()
+            let id = UUID()
+            DataManager.shared.createNewAlarm(id: id, time: 8 * 3600, repeatDays: [false, false, false, false, false, false, false], enabled: true)
+            alarm = DataManager.shared.fetchAlarm(id: id)
+            
         }
         else {
             navigationItem.title = "Edit Alarm"
@@ -76,10 +81,14 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @IBAction func cancelButtonPress(_ sender: Any) {
+        if navigationItem.title == "New Alarm" {
+            DataManager.shared.deleteAlarm(for: alarm!.id)
+        }
         presentingViewController?.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func doneButtonPress(_ sender: Any) {
+        DataManager.shared.updateAlarm(alarm: alarm!)
         delegate?.alarmViewControllerDone(alarm: alarm!)
         presentingViewController?.dismiss(animated: true, completion: nil)
     }

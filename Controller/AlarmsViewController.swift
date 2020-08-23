@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AlarmCellDelegate, AlarmViewControllerDelegate {
     
@@ -42,33 +43,19 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     //MARK: Functions
     
     func populateAlarms() {
-        
-        var alarm: Alarm
-        
-        // Weekdays 5am
-        alarm = Alarm()
-        alarm.time = 5 * 3600
-        for i in 1 ... 5 {
-            alarm.repeatDays[i] = true
+                
+        // MG - Fetch alarms from persistent data store
+        if let alarms = DataManager.shared.fetchAlarmHistory(), alarms.count > 0 {
+            self.alarms = alarms
+        } else {
+            //If fetch result is empty, create new alarm.
+            DataManager.shared.createNewAlarm(id: UUID(), time: 8, repeatDays: [false, true, true, true, true, true, false ], enabled: true)
+            self.alarms = DataManager.shared.fetchAlarmHistory()!
         }
-        alarms.append(alarm)
-        
-        // Weekend 9am
-        alarm = Alarm()
-        alarm.time = 9 * 3600
-        alarm.enabled = false
-        alarm.repeatDays[0] = true
-        alarm.repeatDays[6] = true
-        alarms.append(alarm)
-        
-        // Weekend 9am
-        alarm = Alarm()
-        alarm.time = 12 * 3600
-        alarm.enabled = false
-        alarm.repeatDays[0] = true
-        alarm.repeatDays[6] = true
-        alarms.append(alarm)
-        alarms = alarms.sorted(by: { $0.time < $1.time })
+        for alarm in alarms {
+            NotificationManager.shared.scheduleAlarm(for: alarm)
+        }
+        //MG - removed creation if alarms on app launch
     }
     
     //MARK: TableViewDelegate
@@ -92,6 +79,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        //  MG - Updated function to UISwipeActionsConfiguration, as UITableViewAction was deprecated.
         let delete = UIContextualAction(style: .destructive, title: "Delete") {
             (action, view, completion) in
             self.deleteAlarm(at: indexPath)
@@ -110,6 +98,9 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func deleteAlarm(at indexPath: IndexPath) {
         tableView.beginUpdates()
+        // MG - App crash caused by removing at alarms.count (out of range), changed to indexPath.row
+        print(alarms[indexPath.row].id)
+        DataManager.shared.deleteAlarm(for: alarms[indexPath.row].id)
         alarms.remove(at: indexPath.row)
         tableView.deleteRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
@@ -139,6 +130,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         if let indexPath = tableView.indexPath(for: cell) {
             if let alarm = self.alarm(at: indexPath) {
                 alarm.enabled = enabled
+                DataManager.shared.updateAlarm(alarm: alarm)
             }
         }
     }
@@ -153,11 +145,14 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func alarmViewControllerDone(alarm: Alarm) {
+        // MG - Updated to function to sort alarms into asceding time order, when edited or created.
         if let editingIndexPath = editingIndexPath {
+            // MG - On alarm edit, alarm is moved to correct position in array
             let indexPath = getIndexPathForAlarm(alarm: alarm)
             moveAlarm(from: editingIndexPath, to: indexPath)
             tableView.reloadRows(at: [editingIndexPath], with: .automatic)
         } else if alarms.count == 0 {
+            // MG - Exception to catch fault, when all alarms are deleted, new alarms is added at index 0.
             addAlarm(alarm, at: IndexPath(row: 0, section: 0))
         } else {
             let indexPath = getIndexPathForAlarm(alarm: alarm)
@@ -167,11 +162,14 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func getIndexPathForAlarm(alarm: Alarm) -> IndexPath {
+        // MG - New fucntion to return the indexpath to insert or move alarm to.
+        // MG - Loop through current alarms, to see if new alarm is earlier than any current alarms
         for i in 0 ..< alarms.count {
             if alarm.time < alarms[i].time {
                 return IndexPath(row: i, section: 0)
             }
         }
+        // MG - If new alarm is later, then insert at end of array.
         return IndexPath(row: alarms.count, section: 0)
     }
     
@@ -179,4 +177,6 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         editingIndexPath = nil
     }
 }
+
+
 
