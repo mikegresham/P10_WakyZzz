@@ -35,6 +35,7 @@ class DataManager {
         newAlarm.time = time
         newAlarm.repeatDays = repeatDays
         newAlarm.enabled = enabled
+        newAlarm.snoozeCounter = 0
         
         saveContext()
     }
@@ -83,6 +84,7 @@ class DataManager {
                         returnedAlarm.time = alarm.time
                         returnedAlarm.repeatDays = alarm.repeatDays
                         returnedAlarm.enabled = alarm.enabled
+                        returnedAlarm.snoozeCounter = alarm.snoozeCounter
             
                          saveContext()
                      } else {

@@ -88,6 +88,7 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @IBAction func doneButtonPress(_ sender: Any) {
+        alarm?.snoozeCounter = 0
         DataManager.shared.updateAlarm(alarm: alarm!)
         delegate?.alarmViewControllerDone(alarm: alarm!)
         presentingViewController?.dismiss(animated: true, completion: nil)
@@ -95,7 +96,5 @@ class AlarmViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBAction func datePickerValueChanged(_ sender: Any) {
         alarm?.setTime(date: datePicker.date)
     }
-    
-    
     
 }

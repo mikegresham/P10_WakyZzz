@@ -19,6 +19,8 @@ class Alarm: NSManagedObject {
     @NSManaged var time: Int
     @NSManaged var repeatDays: [Bool]
     @NSManaged var enabled: Bool
+    @NSManaged var snoozeCounter: Int
+    
         
     var alarmDate: Date? {
         let date = Date()

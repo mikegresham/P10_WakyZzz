@@ -18,7 +18,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
             if (granted) {
                 
@@ -98,37 +97,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                willPresent notification: UNNotification,
-                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.alert, .badge, .sound])
-    }
-    
-    func userNotificationCenter(_ center: UNUserNotificationCenter,
-          didReceive response: UNNotificationResponse,
-          withCompletionHandler completionHandler:
-            @escaping () -> Void) {
-          
-      // Perform the task associated with the action.
-      switch response.actionIdentifier {
-      case "STOP_ACTION":
-        print("stop")//code
-         break
-           
-      case "SNOOZE_ACTION":
-        print("Snooze")
-         //Snooze
-         break
-           
-      // Handle other actions…
-    
-      default:
-         break
-      }
-       
-      // Always call the completion handler when done.
-      completionHandler()
-    }
-        
-}

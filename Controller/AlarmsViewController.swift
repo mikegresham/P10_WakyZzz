@@ -8,14 +8,20 @@
 
 import UIKit
 import UserNotifications
+import AVFoundation
 
 class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AlarmCellDelegate, AlarmViewControllerDelegate {
     
     //MARK: IBOutlets & Global Variables
     @IBOutlet weak var tableView: UITableView!
     
+    var userNotificationCenter = UNUserNotificationCenter.current()
+    var audioPlayer: AVAudioPlayer?
+
     var alarms = [Alarm]()
     var editingIndexPath: IndexPath?
+    
+    let alarmPlayer = AlarmPlayer()
     
     //MARK: Button Actions
     
@@ -31,11 +37,16 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         config()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        tableView.reloadData()
+    }
+    
     func config() {
         
         tableView.delegate = self
         tableView.dataSource = self
-        
+        userNotificationCenter.delegate = self
+
         populateAlarms()
         
     }
@@ -52,9 +63,8 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
             DataManager.shared.createNewAlarm(id: UUID(), time: 8, repeatDays: [false, true, true, true, true, true, false ], enabled: true)
             self.alarms = DataManager.shared.fetchAlarmHistory()!
         }
-        for alarm in alarms {
-            NotificationManager.shared.scheduleAlarm(for: alarm)
-        }
+        
+        NotificationManager.shared.scheduleAlarms(alarms: alarms)
         //MG - removed creation if alarms on app launch
     }
     
@@ -74,7 +84,6 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         if let alarm = alarm(at: indexPath) {
             cell.populate(caption: alarm.caption, subcaption: alarm.repeating, enabled: alarm.enabled)
         }
-        
         return cell
     }
     
@@ -130,7 +139,15 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
         if let indexPath = tableView.indexPath(for: cell) {
             if let alarm = self.alarm(at: indexPath) {
                 alarm.enabled = enabled
+                //MG -  update alarm enabled in persistent data storage
                 DataManager.shared.updateAlarm(alarm: alarm)
+                //add or remove scheduled alarm
+                if enabled == true{
+                    NotificationManager.shared.scheduleAlarm(for: alarm)
+                } else {
+                    print("removing alarm")
+                    NotificationManager.shared.removeAlarms(for: alarm.id)
+                }
             }
         }
     }
@@ -159,6 +176,7 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
             addAlarm(alarm, at: indexPath)
         }
         editingIndexPath = nil
+        NotificationManager.shared.scheduleAlarm(for: alarm)
     }
     
     func getIndexPathForAlarm(alarm: Alarm) -> IndexPath {
@@ -180,3 +198,115 @@ class AlarmsViewController: UIViewController, UITableViewDelegate, UITableViewDa
 
 
 
+extension AlarmsViewController: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        handleNotification(notification: notification)
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+          didReceive response: UNNotificationResponse,
+          withCompletionHandler completionHandler:
+            @escaping () -> Void) {
+        
+        let userInfo = response.notification.request.content.userInfo
+        if let alarmID = userInfo["alarmID"] as? String {
+            print(alarmID)
+            // Perform the task associated with the action.
+            switch response.actionIdentifier {
+            case "STOP_ACTION":
+                stopAlarm(alarmID: UUID(uuidString: alarmID)!)
+            case "SNOOZE_ACTION":
+                snoozeAlarm(alarmID: UUID(uuidString: alarmID)!)
+               //Snooze
+               break
+            case "COMPLETE_ACTION":
+                stopAlarm(alarmID: UUID(uuidString: alarmID)!)
+            case "LATER_ACTION":
+                setReminder(alarmID: UUID(uuidString: alarmID)!, actOfKindness: userInfo["actOfKindness"] as! String)
+            // Handle other actions…
+          
+            default:
+                handleNotification(notification: response.notification)
+            }
+             
+        }
+    // Always call the completion handler when done.
+      completionHandler()
+    }
+    
+    func handleNotification(notification: UNNotification) {
+        let userInfo = notification.request.content.userInfo
+        if let actOfKindness = userInfo["actOfKindness"] as? String {
+            let alarmID = UUID(uuidString: (userInfo["alarmID"] as! String))!
+            presentEvilAlert(alarmID: alarmID, message: actOfKindness)
+        }
+        else if let alarmID = userInfo["alarmID"] as? String {
+            presentSnoozeAlert(alarmID: UUID(uuidString: alarmID)!)
+        }
+    }
+    
+    func presentSnoozeAlert(alarmID: UUID){
+        alarmPlayer.playSound(.high)
+
+        let alertController = UIAlertController(title: "WakyZzz", message: "Alarm", preferredStyle: .actionSheet)
+        
+        let snoozeAction = UIAlertAction(title: "Snooze", style: .default, handler: {
+            action in
+            self.snoozeAlarm(alarmID: alarmID)
+        })
+        let stopAction = UIAlertAction(title: "Stop", style: .destructive, handler: {
+            action in
+            self.stopAlarm(alarmID: alarmID)
+        })
+            
+        alertController.addAction(stopAction)
+        alertController.addAction(snoozeAction)
+        present(alertController, animated: true)
+    }
+    
+    func presentEvilAlert(alarmID: UUID, message: String){
+        alarmPlayer.playSound(.evil)
+
+        let title = "You snoozed too many times!"
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+        
+        let completeAction = UIAlertAction(title: "Mark As Completed", style: .default, handler: {
+            action in
+            self.stopAlarm(alarmID: alarmID)
+        })
+        let laterAction = UIAlertAction(title: "Remind Me Later", style: .default, handler: {
+            action in
+            self.setReminder(alarmID: alarmID, actOfKindness: message)
+        })
+        
+        alertController.addAction(completeAction)
+        alertController.addAction(laterAction)
+        present(alertController, animated: true)
+    }
+    
+    func stopAlarm(alarmID: UUID) {
+        alarmPlayer.stopSound()
+        alarms.first(where: { ( $0.id == alarmID )})?.enabled = false
+        alarms.first(where: { ( $0.id == alarmID )})?.snoozeCounter = 0
+        DataManager.shared.updateAlarm(alarm: alarms.first(where: {($0.id == alarmID)})!)
+        NotificationManager.shared.removeAlarms(for: alarmID)
+    }
+    
+    
+    func snoozeAlarm(alarmID: UUID){
+        alarmPlayer.stopSound()
+        //Increment Snooze Counter and update data store
+        alarms.first(where: { $0.id == alarmID })?.snoozeCounter += 1
+        DataManager.shared.updateAlarm(alarm: alarms.first(where: { $0.id == alarmID })!)
+        NotificationManager.shared.snoozeAlarm(alarm: alarms.first(where: { $0.id == alarmID })!)
+    }
+    
+    func setReminder(alarmID: UUID, actOfKindness: String){
+        alarmPlayer.stopSound()
+        let alarm = alarms.first(where: { ( $0.id == alarmID)})
+        NotificationManager.shared.scheduleReminder(alarm: alarm!, actOfKindness: actOfKindness)
+    }
+
+}
