@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="nEb-eO-71f">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="nEb-eO-71f">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -17,7 +18,7 @@
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="1yg-8g-aiN">
                                 <rect key="frame" x="0.0" y="44" width="375" height="623"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="AlarmCell" rowHeight="120" id="VSk-wo-5zH" customClass="AlarmTableViewCell" customModule="WakyZzz" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="55.5" width="375" height="120"/>
@@ -27,7 +28,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12:00 AM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FKQ-CR-bhd">
-                                                    <rect key="frame" x="15" y="11" width="290" height="58.5"/>
+                                                    <rect key="frame" x="16" y="11" width="288" height="58.5"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="58" id="Vvo-ZM-xCs"/>
                                                     </constraints>
@@ -45,7 +46,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aOW-6I-KN4">
-                                                    <rect key="frame" x="313" y="25" width="49" height="31"/>
+                                                    <rect key="frame" x="312" y="25" width="49" height="31"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="47" id="iZG-rw-wMe"/>
                                                         <constraint firstAttribute="height" constant="31" id="itg-jx-VDP"/>
@@ -76,6 +77,7 @@
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="1yg-8g-aiN" firstAttribute="bottom" secondItem="8bC-Xf-vdC" secondAttribute="bottom" id="2JM-NX-NAD"/>
@@ -83,7 +85,6 @@
                             <constraint firstItem="1yg-8g-aiN" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailing" id="s4o-Z4-k7b"/>
                             <constraint firstItem="1yg-8g-aiN" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="zf0-i7-eOF"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" title="WakyZzz" id="Mvb-VG-39B">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="ne3-dC-bY1">
@@ -108,7 +109,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="time" minuteInterval="5" translatesAutoresizingMaskIntoConstraints="NO" id="yhU-rL-ath">
+                            <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="time" minuteInterval="1" style="wheels" translatesAutoresizingMaskIntoConstraints="NO" id="yhU-rL-ath">
                                 <rect key="frame" x="0.0" y="44" width="375" height="200"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="200" id="cbv-5e-JDX"/>
@@ -119,30 +120,30 @@
                             </datePicker>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="kcO-Xc-lqv">
                                 <rect key="frame" x="0.0" y="244" width="375" height="423"/>
-                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                                <color key="backgroundColor" systemColor="groupTableViewBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="none" accessoryType="checkmark" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="DayOfWeekCell" id="Zh0-E4-lCB">
                                         <rect key="frame" x="0.0" y="55.5" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Zh0-E4-lCB" id="NXg-t2-fw3">
-                                            <rect key="frame" x="0.0" y="0.0" width="336" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="335" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="l9z-Ml-6Fk"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="kcO-Xc-lqv" firstAttribute="top" secondItem="yhU-rL-ath" secondAttribute="bottom" id="7Ae-49-8iu"/>
-                            <constraint firstItem="kcO-Xc-lqv" firstAttribute="bottom" secondItem="l9z-Ml-6Fk" secondAttribute="bottom" id="Hma-e7-sTs"/>
-                            <constraint firstItem="yhU-rL-ath" firstAttribute="leading" secondItem="l9z-Ml-6Fk" secondAttribute="leading" id="JMi-AQ-7qM"/>
-                            <constraint firstItem="yhU-rL-ath" firstAttribute="trailing" secondItem="l9z-Ml-6Fk" secondAttribute="trailing" id="S8Y-hd-XS2"/>
-                            <constraint firstItem="kcO-Xc-lqv" firstAttribute="trailing" secondItem="l9z-Ml-6Fk" secondAttribute="trailing" id="buJ-0e-xB1"/>
+                            <constraint firstItem="kcO-Xc-lqv" firstAttribute="bottom" secondItem="XqB-HW-TYn" secondAttribute="bottom" id="Hma-e7-sTs"/>
+                            <constraint firstItem="yhU-rL-ath" firstAttribute="leading" secondItem="kcO-Xc-lqv" secondAttribute="leading" id="JMi-AQ-7qM"/>
+                            <constraint firstItem="yhU-rL-ath" firstAttribute="trailing" secondItem="kcO-Xc-lqv" secondAttribute="trailing" id="S8Y-hd-XS2"/>
+                            <constraint firstItem="kcO-Xc-lqv" firstAttribute="trailing" secondItem="XqB-HW-TYn" secondAttribute="trailing" id="buJ-0e-xB1"/>
                             <constraint firstItem="yhU-rL-ath" firstAttribute="top" secondItem="l9z-Ml-6Fk" secondAttribute="top" id="gwa-om-jd7"/>
-                            <constraint firstItem="kcO-Xc-lqv" firstAttribute="leading" secondItem="l9z-Ml-6Fk" secondAttribute="leading" id="h4A-7A-Duy"/>
+                            <constraint firstItem="kcO-Xc-lqv" firstAttribute="leading" secondItem="XqB-HW-TYn" secondAttribute="leading" id="h4A-7A-Duy"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="l9z-Ml-6Fk"/>
                     </view>
                     <navigationItem key="navigationItem" title="Alarm" id="bOH-f8-i9z">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="HUd-gJ-Ndi">
@@ -202,4 +203,12 @@
             <point key="canvasLocation" x="1780" y="132.68365817091455"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="groupTableViewBackgroundColor">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="groupTableViewBackgroundColor">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>
