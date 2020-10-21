@@ -248,9 +248,16 @@ extension AlarmsViewController: UNUserNotificationCenterDelegate {
     }
     
     func presentSnoozeAlert(alarmID: UUID){
-        alarmPlayer.playSound(.high)
+        let alarm = alarms.first(where: { $0.id == alarmID})
+        
+        switch alarm?.snoozeCounter {
+        case 0:
+            alarmPlayer.playSound(.low)
+        default:
+            alarmPlayer.playSound(.high)
+        }
 
-        let alertController = UIAlertController(title: "WakyZzz", message: "Alarm", preferredStyle: .actionSheet)
+        let alertController = UIAlertController(title: alarm!.caption, message: "Alarm", preferredStyle: .actionSheet)
         
         let snoozeAction = UIAlertAction(title: "Snooze", style: .default, handler: {
             action in
