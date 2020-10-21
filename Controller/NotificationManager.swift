@@ -136,19 +136,19 @@ class NotificationManager {
 
         switch alarm.snoozeCounter {
         case 0:
-            content.title = "WakyZzz"
+            content.title = alarm.caption
             content.body = "Time to wake up!"
             content.userInfo = ["alarmID": "\(alarm.id)"]
             content.categoryIdentifier = "SNOOZE_ACTIONS"
             content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: "alarm_low.mp3"))
         case 1:
-            content.title = "WakyZzz"
+            content.title = alarm.caption
             content.body = "This is your second alarm sleepyhead!"
             content.userInfo = ["alarmID": "\(alarm.id)"]
             content.categoryIdentifier = "SNOOZE_ACTIONS"
             content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: "alarm_high.mp3"))
         default:
-            content.title = "You snoozed too many times!"
+            content.title = "\(alarm.caption) You snoozed too many times!"
             content.body = "Redeem yourself by \(actsOfKindness.randomElement()!)"
             content.userInfo = ["alarmID": "\(alarm.id)", "actOfKindness": content.body]
             content.categoryIdentifier = "EVIL_ACTIONS"
