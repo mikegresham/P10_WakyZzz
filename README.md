@@ -39,6 +39,7 @@ Luckily, in addition to what you managed to gather in house, you got a message f
 > * after user adds a new alarm
 > * after user modifies an existing alarm
 > * after user deletes an  existing alarm
+
 > There’s also no implementation for the random act of kindness request. The feature is missing all the supporting code unfortunately.
 > We are hoping you’ll be able to assist us with the remaining tasks and we can handle it from there within our new in-house team of developers.
 > Thank you for all your amazing work and we look forward to the update.
